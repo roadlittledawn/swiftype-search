@@ -38,7 +38,7 @@ class ResultCard extends React.Component {
   
   generateCategoryPath(category_array, url) {
       if (category_array.length !== 0) {
-          return (category_array.join(' / '));
+          return (category_array.join(' > '));
       }
       else if (url.length > 0) {
           var urlObj = new URL(url);
