@@ -71,6 +71,7 @@ class ResultCard extends React.Component {
           {record.type === 'nru' && <div className="resource-type-label color-yellow">NRU</div>}
           {record.type === 'blog' && <div className="resource-type-label color-red">Blog</div>}
           {record.type === 'storefront' && <div className="resource-type-label color-red">newrelic.com</div>}
+          {record.type === 'developer' && <div className="resource-type-label color-purple">Developer</div>}
           <h2>{record.title}</h2>
           <p>
               {record.highlight.body && <small dangerouslySetInnerHTML={{__html: '...'+record.highlight.body+'...'}}></small>}
