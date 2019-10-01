@@ -271,6 +271,7 @@ export default class SearchHelpResources extends React.Component {
       this.handleResourceTypeDocsContentTypes = this.handleResourceTypeDocsContentTypes.bind(this);
       this.handleResourceTypeDocsCategories = this.handleResourceTypeDocsCategories.bind(this);
       this.keyPress = this.keyPress.bind(this);
+      this.handleSpellingSuggestion = this.handleSpellingSuggestion.bind(this);
   }
   handleChange(event) {
       this.setState({queryString: event.target.value});
@@ -314,11 +315,15 @@ export default class SearchHelpResources extends React.Component {
       }
   }
 
+  handleSpellingSuggestion () {
+    var { text } = this.state.searchResults.info.page.spelling_suggestion;
+    this.setState({queryString: text}, () => this.handleSubmit());
+  }
+
   async handleSubmit(event) {
       // Optional document_type filter for docs
       // "document_type":["page", "attribute_definition", "troubleshooting_doc", "api_doc", "release_notes_platform", "release_notes", "views_page_content"]
       this.setState({ error: null, loading: true });
-      log(event);
       if (event !== undefined) {event.preventDefault();}
       // event.preventDefault();
       const resourceTypeFilters = [];
@@ -334,6 +339,7 @@ export default class SearchHelpResources extends React.Component {
       const jsonBody = {
           "engine_key": "Ad9HfGjDw4GRkcmJjUut",
           "q": this.state.queryString,
+          "spelling" : "strict",
           "per_page": "10",
           "page":this.state.currentPage,
           "filters": {
@@ -341,7 +347,6 @@ export default class SearchHelpResources extends React.Component {
                   "type": resourceTypeFilters,
                   "document_type": docsContentTypeFiltersArr,
                   "category_0" : docsCategoriesFiltersArr,
-                  // "document_type":["!views_page_menu"]
               }
           }
       };
@@ -451,6 +456,11 @@ export default class SearchHelpResources extends React.Component {
                   </form>
               </div>
               {error && (<p className="error-message">Error: {error}</p>)}
+              {searchResults.record_count === 0 && searchResults.info.page.spelling_suggestion &&
+              <div>Try searching for 
+                <button className="search-suggestion link" onClick={this.handleSpellingSuggestion}>{searchResults.info.page.spelling_suggestion.text}</button>
+              </div>
+              }
               {searchResults.record_count &&
                   <Paginator 
                   resultCount = {searchResults.info.page.total_result_count} 
