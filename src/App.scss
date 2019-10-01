@@ -97,6 +97,9 @@
       & > * {
         margin: 0.5em;
       }
+      p {
+        word-break: break-word;
+      }
       .resource-type-label {
         text-transform: uppercase;
         display: inline-block;
