@@ -4,7 +4,8 @@ import PropTypes from 'prop-types'
 import Select from 'react-select';
 import './App.scss';
 
-var {log} = console;
+// eslint-disable-next-line
+var {log} = console; 
 
 const ResultList = ({searchResults}) => {
   if (searchResults.record_count > 0) {
@@ -94,10 +95,7 @@ const FormFilter = ({checked, onChange, title, className, label, children, disab
   return (
       <div className="pretty p-icon p-round p-pulse">
           <input type="checkbox" name={label} checked={checked} disabled={disabled} onChange={onChange} title={title} />
-          <div className={`state ${className}`}>
-              <i className="icon mdi mdi-check"></i>
-              <label htmlFor={label}>{children}</label>
-          </div>
+          <label htmlFor={label}>{children}</label>
       </div>
   )
 }
@@ -245,20 +243,6 @@ SelectFilterDocsCategories.propTypes = {
 }
 
 export default class SearchHelpResources extends React.Component {
-  static propTypes = {
-      entity: PropTypes.object,
-      entities: PropTypes.array,
-      entityCount: PropTypes.object,
-      entitiesById: PropTypes.object,
-      entitiesByDomainType: PropTypes.object,
-      relationshipsById: PropTypes.object,
-      summaryDataById: PropTypes.object,
-      isLoadingEntities: PropTypes.bool,
-      headerState: PropTypes.object,
-      nr1: PropTypes.object,
-      width: PropTypes.number,
-      height: PropTypes.number,
-  }
   constructor(props) {
       super(props);
       this.state = {
@@ -334,7 +318,8 @@ export default class SearchHelpResources extends React.Component {
       // "document_type":["page", "attribute_definition", "troubleshooting_doc", "api_doc", "release_notes_platform", "release_notes", "views_page_content"]
       this.setState({ error: null, loading: true });
       log(event);
-      event.preventDefault();
+      if (event !== undefined) {event.preventDefault();}
+      // event.preventDefault();
       const resourceTypeFilters = [];
       const docsContentTypeFiltersArr = this.state.resourceTypeDocsContentTypes.map(docType=>docType.value);
       const docsCategoriesFiltersArr = this.state.resourceTypeDocsCategories.map(docType=>docType.value);
@@ -344,6 +329,7 @@ export default class SearchHelpResources extends React.Component {
       if (this.state.resourceTypeBlog === true) {resourceTypeFilters.push('blog')}
       if (this.state.resourceTypeNru === true) {resourceTypeFilters.push('nru')}
       if (this.state.resourceTypeStorefront === true) {resourceTypeFilters.push('storefront')}
+      if (this.state.resourceTypeDeveloperSite === true) {resourceTypeFilters.push('developer')}
       const jsonBody = {
           "engine_key": "Ad9HfGjDw4GRkcmJjUut",
           "q": this.state.queryString,
