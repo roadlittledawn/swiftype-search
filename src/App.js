@@ -220,7 +220,7 @@ class SelectFilterDocsCategories extends React.Component {
       if (categories.primaryNavTerms) {
       categories.primaryNavTerms.map((value) => {
             let termObj = {value: value.term.displayName, label: value.term.displayName};
-            docsCategoriesOptions.push(termObj);
+            return docsCategoriesOptions.push(termObj);
         })
       }
       
