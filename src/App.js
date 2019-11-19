@@ -337,7 +337,7 @@ export default class SearchHelpResources extends React.Component {
       if (this.state.resourceTypeStorefront === true) {resourceTypeFilters.push('storefront')}
       if (this.state.resourceTypeDeveloperSite === true) {resourceTypeFilters.push('developer')}
       const jsonBody = {
-          "engine_key": "Ad9HfGjDw4GRkcmJjUut",
+          "engine_key": process.env.REACT_APP_SWIFTYPE_ENGINE_KEY,
           "q": this.state.queryString,
           "spelling" : "strict",
           "per_page": "10",
