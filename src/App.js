@@ -305,7 +305,6 @@ export default class SearchHelpResources extends React.Component {
   handleResourceTypeDocsCategories(docsCategoryArray) {
       let values = [];
       let {selectedOption} = docsCategoryArray
-      log(docsCategoryArray)
       if (Array.isArray(selectedOption) && selectedOption.length > 0) {
         docsCategoryArray.selectedOption.forEach(element => {
             values.push(element);
