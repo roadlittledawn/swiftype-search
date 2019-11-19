@@ -1,9 +1,9 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+// import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Select from 'react-select';
 import './App.scss';
-
+ 
 // eslint-disable-next-line
 var {log} = console; 
 
