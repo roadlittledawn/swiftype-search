@@ -1,10 +1,11 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+// import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import Select from 'react-select';
 import './App.scss';
-
-var {log} = console;
+ 
+// eslint-disable-next-line
+var {log} = console; 
 
 const ResultList = ({searchResults}) => {
   if (searchResults.record_count > 0) {
@@ -37,7 +38,7 @@ class ResultCard extends React.Component {
   
   generateCategoryPath(category_array, url) {
       if (category_array.length !== 0) {
-          return (category_array.join(' / '));
+          return (category_array.join(' > '));
       }
       else if (url.length > 0) {
           var urlObj = new URL(url);
@@ -70,6 +71,7 @@ class ResultCard extends React.Component {
           {record.type === 'nru' && <div className="resource-type-label color-yellow">NRU</div>}
           {record.type === 'blog' && <div className="resource-type-label color-red">Blog</div>}
           {record.type === 'storefront' && <div className="resource-type-label color-red">newrelic.com</div>}
+          {record.type === 'developer' && <div className="resource-type-label color-purple">Developer</div>}
           <h2>{record.title}</h2>
           <p>
               {record.highlight.body && <small dangerouslySetInnerHTML={{__html: '...'+record.highlight.body+'...'}}></small>}
@@ -94,10 +96,7 @@ const FormFilter = ({checked, onChange, title, className, label, children, disab
   return (
       <div className="pretty p-icon p-round p-pulse">
           <input type="checkbox" name={label} checked={checked} disabled={disabled} onChange={onChange} title={title} />
-          <div className={`state ${className}`}>
-              <i className="icon mdi mdi-check"></i>
-              <label htmlFor={label}>{children}</label>
-          </div>
+          <label htmlFor={label}>{children}</label>
       </div>
   )
 }
@@ -221,7 +220,7 @@ class SelectFilterDocsCategories extends React.Component {
       if (categories.primaryNavTerms) {
       categories.primaryNavTerms.map((value) => {
             let termObj = {value: value.term.displayName, label: value.term.displayName};
-            docsCategoriesOptions.push(termObj);
+            return docsCategoriesOptions.push(termObj);
         })
       }
       
@@ -245,20 +244,6 @@ SelectFilterDocsCategories.propTypes = {
 }
 
 export default class SearchHelpResources extends React.Component {
-  static propTypes = {
-      entity: PropTypes.object,
-      entities: PropTypes.array,
-      entityCount: PropTypes.object,
-      entitiesById: PropTypes.object,
-      entitiesByDomainType: PropTypes.object,
-      relationshipsById: PropTypes.object,
-      summaryDataById: PropTypes.object,
-      isLoadingEntities: PropTypes.bool,
-      headerState: PropTypes.object,
-      nr1: PropTypes.object,
-      width: PropTypes.number,
-      height: PropTypes.number,
-  }
   constructor(props) {
       super(props);
       this.state = {
@@ -286,6 +271,7 @@ export default class SearchHelpResources extends React.Component {
       this.handleResourceTypeDocsContentTypes = this.handleResourceTypeDocsContentTypes.bind(this);
       this.handleResourceTypeDocsCategories = this.handleResourceTypeDocsCategories.bind(this);
       this.keyPress = this.keyPress.bind(this);
+      this.handleSpellingSuggestion = this.handleSpellingSuggestion.bind(this);
   }
   handleChange(event) {
       this.setState({queryString: event.target.value});
@@ -317,10 +303,13 @@ export default class SearchHelpResources extends React.Component {
       this.setState({resourceTypeDocsContentTypes: values});
   }
   handleResourceTypeDocsCategories(docsCategoryArray) {
-      var values = [];
-      docsCategoryArray.selectedOption.forEach(element => {
-          values.push(element);
-      });
+      let values = [];
+      let {selectedOption} = docsCategoryArray
+      if (Array.isArray(selectedOption) && selectedOption.length > 0) {
+        docsCategoryArray.selectedOption.forEach(element => {
+            values.push(element);
+        });
+      }
       this.setState({resourceTypeDocsCategories: values});
   }
   keyPress(e) {
@@ -329,12 +318,17 @@ export default class SearchHelpResources extends React.Component {
       }
   }
 
+  handleSpellingSuggestion () {
+    var { text } = this.state.searchResults.info.page.spelling_suggestion;
+    this.setState({queryString: text}, () => this.handleSubmit());
+  }
+
   async handleSubmit(event) {
       // Optional document_type filter for docs
       // "document_type":["page", "attribute_definition", "troubleshooting_doc", "api_doc", "release_notes_platform", "release_notes", "views_page_content"]
       this.setState({ error: null, loading: true });
-      log(event);
-      event.preventDefault();
+      if (event !== undefined) {event.preventDefault();}
+      // event.preventDefault();
       const resourceTypeFilters = [];
       const docsContentTypeFiltersArr = this.state.resourceTypeDocsContentTypes.map(docType=>docType.value);
       const docsCategoriesFiltersArr = this.state.resourceTypeDocsCategories.map(docType=>docType.value);
@@ -344,9 +338,11 @@ export default class SearchHelpResources extends React.Component {
       if (this.state.resourceTypeBlog === true) {resourceTypeFilters.push('blog')}
       if (this.state.resourceTypeNru === true) {resourceTypeFilters.push('nru')}
       if (this.state.resourceTypeStorefront === true) {resourceTypeFilters.push('storefront')}
+      if (this.state.resourceTypeDeveloperSite === true) {resourceTypeFilters.push('developer')}
       const jsonBody = {
-          "engine_key": "Ad9HfGjDw4GRkcmJjUut",
+          "engine_key": process.env.REACT_APP_SWIFTYPE_ENGINE_KEY,
           "q": this.state.queryString,
+          "spelling" : "strict",
           "per_page": "10",
           "page":this.state.currentPage,
           "filters": {
@@ -354,7 +350,6 @@ export default class SearchHelpResources extends React.Component {
                   "type": resourceTypeFilters,
                   "document_type": docsContentTypeFiltersArr,
                   "category_0" : docsCategoriesFiltersArr,
-                  // "document_type":["!views_page_menu"]
               }
           }
       };
@@ -464,6 +459,11 @@ export default class SearchHelpResources extends React.Component {
                   </form>
               </div>
               {error && (<p className="error-message">Error: {error}</p>)}
+              {searchResults.record_count === 0 && searchResults.info.page.spelling_suggestion &&
+              <div>Try searching for 
+                <button className="search-suggestion link" onClick={this.handleSpellingSuggestion}>{searchResults.info.page.spelling_suggestion.text}</button>
+              </div>
+              }
               {searchResults.record_count &&
                   <Paginator 
                   resultCount = {searchResults.info.page.total_result_count} 

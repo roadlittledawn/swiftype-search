@@ -97,6 +97,9 @@
       & > * {
         margin: 0.5em;
       }
+      p {
+        word-break: break-word;
+      }
       .resource-type-label {
         text-transform: uppercase;
         display: inline-block;
@@ -115,6 +118,9 @@
         }
         &.color-yellow {
           background-color: #f0ad4e;
+        }
+        &.color-purple {
+          background-color: #b597f9;
         }
       }
       .category-path {
